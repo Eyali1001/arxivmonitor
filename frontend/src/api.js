@@ -34,4 +34,9 @@ export async function getSyncStatus() {
   return response.data;
 }
 
+export async function getParentCategoryStats(parentId) {
+  const response = await api.get(`/parent/${parentId}/stats`);
+  return response.data;
+}
+
 export default api;

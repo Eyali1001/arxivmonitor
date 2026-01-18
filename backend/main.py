@@ -249,6 +249,23 @@ async def get_trend_stats(category_id: str):
     )
 
 
+@app.get("/api/parent/{parent_id}/stats", response_model=list[TrendStats])
+async def get_parent_category_stats(parent_id: str):
+    """Get stats for all subcategories within a parent category."""
+    if parent_id not in ARXIV_CATEGORIES:
+        raise HTTPException(status_code=404, detail=f"Parent category {parent_id} not found")
+
+    all_stats = []
+    for sub_id in ARXIV_CATEGORIES[parent_id]["subcategories"].keys():
+        stats = await get_trend_stats(sub_id)
+        if stats.total_papers > 0:
+            all_stats.append(stats)
+
+    # Sort by hype score descending
+    all_stats.sort(key=lambda x: x.hype_score, reverse=True)
+    return all_stats
+
+
 @app.get("/api/hype", response_model=list[TrendStats])
 async def get_hype_categories(limit: int = 10):
     """Get top trending categories (increasing publications)."""

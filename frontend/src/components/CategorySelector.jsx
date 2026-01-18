@@ -37,6 +37,17 @@ export default function CategorySelector({ selectedCategory, onSelectCategory })
         onChange={(e) => onSelectCategory(e.target.value)}
       >
         <option value="">-- Choose a category --</option>
+
+        {/* Parent categories - view all subcategories at once */}
+        <optgroup label="View All Subcategories">
+          {categories.map((group) => (
+            <option key={`parent:${group.id}`} value={`parent:${group.id}`}>
+              📊 All {group.name} ({group.subcategories.length} categories)
+            </option>
+          ))}
+        </optgroup>
+
+        {/* Individual subcategories */}
         {categories.map((group) => (
           <optgroup key={group.id} label={group.name}>
             {group.subcategories.map((sub) => (
