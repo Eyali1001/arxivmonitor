@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -90,15 +90,57 @@ function SingleCategoryChart({ categoryId }) {
   );
 }
 
+function MiniTrendChart({ categoryId }) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const trendsData = await getTrends(categoryId);
+        const formatted = trendsData.map(item => ({
+          date: `${item.year}-${String(item.month).padStart(2, '0')}`,
+          count: item.count
+        }));
+        setData(formatted);
+      } catch (err) {
+        console.error('Failed to load trend', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [categoryId]);
+
+  if (loading) return <div style={{ padding: '20px', color: '#6b7280' }}>Loading chart...</div>;
+  if (data.length === 0) return <div style={{ padding: '20px', color: '#6b7280' }}>No data</div>;
+
+  return (
+    <div style={{ padding: '10px 0' }}>
+      <ResponsiveContainer width="100%" height={200}>
+        <LineChart data={data} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+          <XAxis dataKey="date" tick={{ fontSize: 9 }} interval={7} />
+          <YAxis tick={{ fontSize: 9 }} />
+          <Tooltip />
+          <Line type="monotone" dataKey="count" stroke="#2563eb" strokeWidth={2} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
 function ParentCategoryView({ parentId }) {
   const [stats, setStats] = useState([]);
   const [trendsData, setTrendsData] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [expandedCategory, setExpandedCategory] = useState(null);
 
   useEffect(() => {
     async function fetchData() {
       setLoading(true);
+      setExpandedCategory(null);
       try {
         const statsData = await getParentCategoryStats(parentId);
         setStats(statsData);
@@ -199,12 +241,13 @@ function ParentCategoryView({ parentId }) {
         </div>
       )}
 
-      {/* Stats table */}
+      {/* Stats table with expandable rows */}
       <div>
-        <h4>All Subcategories</h4>
+        <h4>All Subcategories <span style={{ fontWeight: 'normal', color: '#6b7280', fontSize: '12px' }}>(click to expand chart)</span></h4>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #e5e7eb', textAlign: 'left' }}>
+              <th style={{ padding: '8px', width: '30px' }}></th>
               <th style={{ padding: '8px' }}>Category</th>
               <th style={{ padding: '8px' }}>Name</th>
               <th style={{ padding: '8px', textAlign: 'right' }}>Total Papers</th>
@@ -214,20 +257,43 @@ function ParentCategoryView({ parentId }) {
           </thead>
           <tbody>
             {stats.map((s, i) => (
-              <tr key={s.category_id} style={{ borderBottom: '1px solid #e5e7eb', background: i % 2 ? '#f9fafb' : 'white' }}>
-                <td style={{ padding: '8px', fontWeight: 'bold' }}>{s.category_id}</td>
-                <td style={{ padding: '8px' }}>{s.category_name}</td>
-                <td style={{ padding: '8px', textAlign: 'right' }}>{s.total_papers.toLocaleString()}</td>
-                <td style={{ padding: '8px', textAlign: 'right' }}>{s.average_monthly.toFixed(0)}</td>
-                <td style={{
-                  padding: '8px',
-                  textAlign: 'right',
-                  color: s.hype_score > 20 ? '#16a34a' : s.hype_score < -5 ? '#dc2626' : '#6b7280',
-                  fontWeight: 'bold'
-                }}>
-                  {s.hype_score > 0 ? '+' : ''}{s.hype_score.toFixed(1)}%
-                </td>
-              </tr>
+              <React.Fragment key={s.category_id}>
+                <tr
+                  key={s.category_id}
+                  onClick={() => setExpandedCategory(expandedCategory === s.category_id ? null : s.category_id)}
+                  style={{
+                    borderBottom: expandedCategory === s.category_id ? 'none' : '1px solid #e5e7eb',
+                    background: i % 2 ? '#f9fafb' : 'white',
+                    cursor: 'pointer',
+                    transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#e0e7ff'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = i % 2 ? '#f9fafb' : 'white'}
+                >
+                  <td style={{ padding: '8px', color: '#6b7280' }}>
+                    {expandedCategory === s.category_id ? '▼' : '▶'}
+                  </td>
+                  <td style={{ padding: '8px', fontWeight: 'bold' }}>{s.category_id}</td>
+                  <td style={{ padding: '8px' }}>{s.category_name}</td>
+                  <td style={{ padding: '8px', textAlign: 'right' }}>{s.total_papers.toLocaleString()}</td>
+                  <td style={{ padding: '8px', textAlign: 'right' }}>{s.average_monthly.toFixed(0)}</td>
+                  <td style={{
+                    padding: '8px',
+                    textAlign: 'right',
+                    color: s.hype_score > 20 ? '#16a34a' : s.hype_score < -5 ? '#dc2626' : '#6b7280',
+                    fontWeight: 'bold'
+                  }}>
+                    {s.hype_score > 0 ? '+' : ''}{s.hype_score.toFixed(1)}%
+                  </td>
+                </tr>
+                {expandedCategory === s.category_id && (
+                  <tr style={{ background: '#f8fafc' }}>
+                    <td colSpan={6} style={{ padding: '0 20px 20px 20px', borderBottom: '1px solid #e5e7eb' }}>
+                      <MiniTrendChart categoryId={s.category_id} />
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
