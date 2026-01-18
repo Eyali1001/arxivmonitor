@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import CategorySelector from './CategorySelector';
 import TrendChart from './TrendChart';
 import HypeIndicator from './HypeIndicator';
+import ReportViewer from './ReportViewer';
 import { getSyncStatus } from '../api';
 
 function SyncProgress({ current, total, message }) {
@@ -31,6 +32,7 @@ function SyncProgress({ current, total, message }) {
 export default function Dashboard() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [syncStatus, setSyncStatus] = useState(null);
+  const [activeTab, setActiveTab] = useState('trends');
 
   useEffect(() => {
     let interval;
@@ -69,19 +71,42 @@ export default function Dashboard() {
         )}
       </header>
 
-      <main className="dashboard-main">
-        <section className="chart-section">
-          <CategorySelector
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
-          <TrendChart categoryId={selectedCategory} />
-        </section>
+      <div className="tab-nav">
+        <button
+          className={`tab-btn ${activeTab === 'trends' ? 'active' : ''}`}
+          onClick={() => setActiveTab('trends')}
+        >
+          Interactive Trends
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'reports' ? 'active' : ''}`}
+          onClick={() => setActiveTab('reports')}
+        >
+          Analysis Reports
+        </button>
+      </div>
 
-        <aside className="sidebar">
-          <HypeIndicator onSelectCategory={setSelectedCategory} />
-        </aside>
-      </main>
+      {activeTab === 'trends' && (
+        <main className="dashboard-main">
+          <section className="chart-section">
+            <CategorySelector
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
+            <TrendChart categoryId={selectedCategory} />
+          </section>
+
+          <aside className="sidebar">
+            <HypeIndicator onSelectCategory={setSelectedCategory} />
+          </aside>
+        </main>
+      )}
+
+      {activeTab === 'reports' && (
+        <main>
+          <ReportViewer />
+        </main>
+      )}
     </div>
   );
 }

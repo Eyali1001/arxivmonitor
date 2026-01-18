@@ -1,0 +1,4 @@
+id,name,total_papers,avg_monthly,growth_pct,volatility,trend_linearity,yoy_2023,yoy_2024,acceleration,first_year_avg,last_year_avg
+econ.EM,Econometrics,2828,58.9,57.1,25.2,0.739,7.6,24.6,17.0,47.2,74.2
+econ.GN,General Economics,3921,81.7,91.9,29.4,0.835,16.7,21.2,4.5,59.4,114.0
+econ.TH,Theoretical Economics,2394,49.9,77.0,31.1,0.691,2.9,13.5,10.6,40.2,71.1

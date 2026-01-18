@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -352,6 +353,59 @@ async def get_sync_status():
 async def health_check():
     """Health check endpoint."""
     return {"status": "healthy"}
+
+
+# Reports endpoints
+REPORTS_DIR = Path(__file__).parent.parent / "analysis"
+
+REPORT_METADATA = {
+    "cs": {"name": "Computer Science", "file": "cs_trends_report.md"},
+    "math": {"name": "Mathematics", "file": "math_trends_report.md"},
+    "physics": {"name": "Physics", "file": "physics_trends_report.md"},
+    "stat": {"name": "Statistics", "file": "stat_trends_report.md"},
+    "q-bio": {"name": "Quantitative Biology", "file": "q-bio_trends_report.md"},
+    "q-fin": {"name": "Quantitative Finance", "file": "q-fin_trends_report.md"},
+    "eess": {"name": "Electrical Engineering", "file": "eess_trends_report.md"},
+    "econ": {"name": "Economics", "file": "econ_trends_report.md"},
+}
+
+
+class ReportSummary(BaseModel):
+    id: str
+    name: str
+
+
+class ReportContent(BaseModel):
+    id: str
+    name: str
+    content: str
+
+
+@app.get("/api/reports", response_model=list[ReportSummary])
+async def list_reports():
+    """List available analysis reports."""
+    reports = []
+    for report_id, meta in REPORT_METADATA.items():
+        report_path = REPORTS_DIR / meta["file"]
+        if report_path.exists():
+            reports.append(ReportSummary(id=report_id, name=meta["name"]))
+    return reports
+
+
+@app.get("/api/reports/{report_id}", response_model=ReportContent)
+async def get_report(report_id: str):
+    """Get a specific analysis report."""
+    if report_id not in REPORT_METADATA:
+        raise HTTPException(status_code=404, detail=f"Report {report_id} not found")
+
+    meta = REPORT_METADATA[report_id]
+    report_path = REPORTS_DIR / meta["file"]
+
+    if not report_path.exists():
+        raise HTTPException(status_code=404, detail=f"Report file not found")
+
+    content = report_path.read_text()
+    return ReportContent(id=report_id, name=meta["name"], content=content)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,40 @@
+id,name,total_papers,avg_monthly,growth_pct,volatility,trend_linearity,yoy_2023,yoy_2024,acceleration,first_year_avg,last_year_avg
+cs.AI,Artificial Intelligence,114568,2386.8,204.7,44.2,0.927,47.0,51.9,4.9,1231.8,3753.5
+cs.AR,Hardware Architecture,4684,97.6,117.2,32.4,0.905,19.9,33.7,13.8,65.3,141.9
+cs.CC,Computational Complexity,3621,75.4,33.8,25.4,0.473,8.7,16.4,7.8,64.3,86.1
+cs.CE,"Computational Engineering, Finance, and Science",4964,103.4,145.2,37.1,0.902,42.4,50.0,7.6,59.0,144.7
+cs.CG,Computational Geometry,2283,47.6,20.8,22.8,0.313,5.4,7.9,2.5,43.2,52.2
+cs.CL,Computation and Language,66863,1393.0,164.4,47.1,0.733,51.4,52.3,0.9,746.6,1974.0
+cs.CR,Cryptography and Security,24139,502.9,76.3,24.9,0.89,15.2,26.4,11.2,374.4,660.2
+cs.CV,Computer Vision and Pattern Recognition,109730,2286.0,78.2,27.8,0.814,24.2,25.7,1.5,1636.9,2917.3
+cs.CY,Computers and Society,14432,300.7,127.7,33.4,0.886,37.2,35.0,-2.2,185.0,421.3
+cs.DB,Databases,4486,93.5,76.9,26.7,0.833,15.5,20.9,5.4,70.2,124.2
+cs.DC,"Distributed, Parallel, and Cluster Computing",11548,240.6,66.1,22.7,0.864,15.1,21.5,6.4,184.7,306.8
+cs.DL,Digital Libraries,1873,39.0,69.3,25.6,0.774,16.8,17.5,0.7,29.8,50.5
+cs.DM,Discrete Mathematics,4406,91.8,15.4,13.1,0.382,4.8,5.0,0.2,85.3,98.5
+cs.DS,Data Structures and Algorithms,8937,186.2,17.2,19.1,0.345,9.4,3.9,-5.5,169.2,198.2
+cs.ET,Emerging Technologies,3891,81.1,212.7,48.2,0.871,38.4,95.0,56.6,39.5,123.5
+cs.FL,Formal Languages and Automata Theory,1889,39.4,27.2,22.2,0.376,12.9,-1.9,-14.8,34.9,44.4
+cs.GR,Graphics,5177,107.9,73.2,27.2,0.742,33.0,18.2,-14.8,76.6,132.7
+cs.GT,Computer Science and Game Theory,5660,117.9,33.0,24.8,0.403,11.0,16.9,5.9,99.6,132.4
+cs.HC,Human-Computer Interaction,18110,377.3,160.7,37.3,0.886,48.0,46.1,-1.9,208.2,542.8
+cs.IR,Information Retrieval,12432,259.0,90.6,30.4,0.796,22.9,38.2,15.3,177.6,338.5
+cs.IT,Information Theory,14727,306.8,7.0,16.3,0.107,0.9,4.3,3.4,297.1,317.8
+cs.LG,Machine Learning,147469,3072.3,60.6,25.5,0.721,14.7,21.0,6.4,2390.2,3839.9
+cs.LO,Logic in Computer Science,5789,120.6,36.8,22.2,0.388,20.1,-3.4,-23.5,102.0,139.6
+cs.MA,Multiagent Systems,6061,126.3,134.1,40.3,0.809,15.1,17.0,1.9,86.5,202.5
+cs.MM,Multimedia,5118,106.6,68.9,29.9,0.706,28.3,22.6,-5.6,76.9,129.9
+cs.MS,Mathematical Software,736,15.3,24.6,26.7,0.299,4.8,6.3,1.5,13.9,17.3
+cs.NA,Numerical Analysis,18058,376.2,28.9,13.5,0.716,11.2,10.5,-0.7,325.0,418.8
+cs.NE,Neural and Evolutionary Computing,6549,136.4,6.9,17.5,0.173,1.8,21.3,19.5,126.2,134.9
+cs.NI,Networking and Internet Architecture,9141,190.4,40.9,19.2,0.69,5.5,20.4,14.9,160.9,226.8
+cs.OH,Other Computer Science,180,6.2,-9.0,21.3,-0.106,4.3,-14.6,-18.9,6.5,5.9
+cs.OS,Operating Systems,535,12.7,145.2,41.5,0.778,101.9,32.1,-69.7,7.8,19.0
+cs.PF,Performance,1979,41.2,105.1,32.2,0.838,25.4,7.5,-17.9,29.2,59.8
+cs.PL,Programming Languages,3439,71.6,48.7,22.4,0.669,13.7,4.3,-9.4,59.6,88.6
+cs.RO,Robotics,31158,649.1,103.1,35.9,0.757,29.6,28.6,-1.0,433.3,880.0
+cs.SC,Symbolic Computation,991,20.6,40.6,32.0,0.297,9.2,18.1,9.0,17.2,24.2
+cs.SD,Sound,12062,251.3,30.0,39.9,0.299,2.5,15.0,12.5,223.2,290.2
+cs.SE,Software Engineering,13574,282.8,161.0,38.0,0.912,35.9,35.8,-0.1,166.0,433.3
+cs.SI,Social and Information Networks,7479,155.8,7.0,13.5,0.182,8.9,8.7,-0.3,143.5,153.5
+cs.SY,Systems and Control,23304,485.5,56.3,22.4,0.771,12.5,13.1,0.6,391.6,611.9

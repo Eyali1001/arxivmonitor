@@ -1,0 +1,7 @@
+id,name,total_papers,avg_monthly,growth_pct,volatility,trend_linearity,yoy_2023,yoy_2024,acceleration,first_year_avg,last_year_avg
+stat.AP,Applications,8697,181.2,33.4,17.0,0.673,2.6,9.8,7.2,161.6,215.5
+stat.CO,Computation,3517,73.3,21.9,19.1,0.514,-10.7,27.3,38.1,69.0,84.1
+stat.ME,Methodology,15108,314.8,39.0,17.8,0.739,7.2,12.8,5.6,269.6,374.7
+stat.ML,Machine Learning,22613,471.1,28.3,28.8,0.326,6.8,10.8,4.0,415.7,533.2
+stat.OT,Other Statistics,566,12.3,47.6,34.3,0.447,18.3,-5.1,-23.4,10.5,15.5
+stat.TH,Statistics Theory,8525,177.6,26.8,18.8,0.532,-0.2,11.8,12.0,162.1,205.5

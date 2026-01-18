@@ -1,0 +1,5 @@
+id,name,total_papers,avg_monthly,growth_pct,volatility,trend_linearity,yoy_2023,yoy_2024,acceleration,first_year_avg,last_year_avg
+eess.AS,Audio and Speech Processing,13404,279.2,18.0,41.2,0.192,7.6,15.4,7.8,248.3,293.0
+eess.IV,Image and Video Processing,17218,358.7,-3.9,19.2,-0.049,3.2,8.6,5.4,348.8,335.2
+eess.SP,Signal Processing,21768,453.5,37.9,15.9,0.798,8.5,18.1,9.6,382.2,527.0
+eess.SY,Systems and Control,23299,485.4,56.2,22.4,0.771,12.5,13.1,0.6,391.6,611.5

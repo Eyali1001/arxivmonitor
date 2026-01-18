@@ -43,4 +43,14 @@ export async function getParentCategoryStats(parentId) {
   return response.data;
 }
 
+export async function getReports() {
+  const response = await api.get('/reports');
+  return response.data;
+}
+
+export async function getReport(reportId) {
+  const response = await api.get(`/reports/${reportId}`);
+  return response.data;
+}
+
 export default api;
