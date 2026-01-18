@@ -19,13 +19,17 @@ export async function getTrendStats(categoryId) {
   return response.data;
 }
 
-export async function getHypeCategories(limit = 10) {
-  const response = await api.get('/hype', { params: { limit } });
+export async function getHypeCategories(limit = 10, parent = null) {
+  const params = { limit };
+  if (parent) params.parent = parent;
+  const response = await api.get('/hype', { params });
   return response.data;
 }
 
-export async function getDecliningCategories(limit = 10) {
-  const response = await api.get('/declining', { params: { limit } });
+export async function getDecliningCategories(limit = 10, parent = null) {
+  const params = { limit };
+  if (parent) params.parent = parent;
+  const response = await api.get('/declining', { params });
   return response.data;
 }
 

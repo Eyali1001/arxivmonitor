@@ -267,15 +267,23 @@ async def get_parent_category_stats(parent_id: str):
 
 
 @app.get("/api/hype", response_model=list[TrendStats])
-async def get_hype_categories(limit: int = 10):
-    """Get top trending categories (increasing publications)."""
+async def get_hype_categories(limit: int = 10, parent: Optional[str] = None):
+    """Get top trending categories. Optionally filter by parent category."""
     all_stats = []
 
-    for parent_data in ARXIV_CATEGORIES.values():
-        for sub_id in parent_data["subcategories"].keys():
+    if parent and parent in ARXIV_CATEGORIES:
+        # Filter to specific parent
+        for sub_id in ARXIV_CATEGORIES[parent]["subcategories"].keys():
             stats = await get_trend_stats(sub_id)
-            if stats.total_papers > 0:  # Only include categories with data
+            if stats.total_papers > 0:
                 all_stats.append(stats)
+    else:
+        # All categories
+        for parent_data in ARXIV_CATEGORIES.values():
+            for sub_id in parent_data["subcategories"].keys():
+                stats = await get_trend_stats(sub_id)
+                if stats.total_papers > 0:
+                    all_stats.append(stats)
 
     # Sort by hype score descending
     all_stats.sort(key=lambda x: x.hype_score, reverse=True)
@@ -283,15 +291,23 @@ async def get_hype_categories(limit: int = 10):
 
 
 @app.get("/api/declining", response_model=list[TrendStats])
-async def get_declining_categories(limit: int = 10):
-    """Get categories with declining publications."""
+async def get_declining_categories(limit: int = 10, parent: Optional[str] = None):
+    """Get categories with declining publications. Optionally filter by parent."""
     all_stats = []
 
-    for parent_data in ARXIV_CATEGORIES.values():
-        for sub_id in parent_data["subcategories"].keys():
+    if parent and parent in ARXIV_CATEGORIES:
+        # Filter to specific parent
+        for sub_id in ARXIV_CATEGORIES[parent]["subcategories"].keys():
             stats = await get_trend_stats(sub_id)
             if stats.total_papers > 0:
                 all_stats.append(stats)
+    else:
+        # All categories
+        for parent_data in ARXIV_CATEGORIES.values():
+            for sub_id in parent_data["subcategories"].keys():
+                stats = await get_trend_stats(sub_id)
+                if stats.total_papers > 0:
+                    all_stats.append(stats)
 
     # Sort by hype score ascending (most declining first)
     all_stats.sort(key=lambda x: x.hype_score)

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { getHypeCategories, getDecliningCategories } from '../api';
+import { getHypeCategories, getDecliningCategories, getCategories } from '../api';
 
 function TrendBadge({ direction, score }) {
   const getColor = () => {
@@ -40,7 +40,7 @@ function CategoryList({ title, categories, type, onSelectCategory }) {
     return (
       <div className={`category-list ${type}`}>
         <h3>{title}</h3>
-        <p className="no-data">No data available. Sync data to see trends.</p>
+        <p className="no-data">No data available.</p>
       </div>
     );
   }
@@ -70,18 +70,37 @@ function CategoryList({ title, categories, type, onSelectCategory }) {
 export default function HypeIndicator({ onSelectCategory }) {
   const [hypeCategories, setHypeCategories] = useState([]);
   const [decliningCategories, setDecliningCategories] = useState([]);
+  const [parentCategories, setParentCategories] = useState([]);
+  const [selectedParent, setSelectedParent] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Fetch parent categories on mount
+  useEffect(() => {
+    async function fetchParents() {
+      try {
+        const cats = await getCategories();
+        setParentCategories(cats);
+      } catch (err) {
+        console.error('Failed to load parent categories');
+      }
+    }
+    fetchParents();
+  }, []);
+
+  // Fetch hype/declining when filter changes
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       try {
+        const parent = selectedParent || null;
         const [hype, declining] = await Promise.all([
-          getHypeCategories(5),
-          getDecliningCategories(5)
+          getHypeCategories(5, parent),
+          getDecliningCategories(5, parent)
         ]);
         setHypeCategories(hype);
         setDecliningCategories(declining);
+        setError(null);
       } catch (err) {
         setError('Failed to load trend indicators');
       } finally {
@@ -89,27 +108,11 @@ export default function HypeIndicator({ onSelectCategory }) {
       }
     }
     fetchData();
-  }, []);
+  }, [selectedParent]);
 
-  const refresh = async () => {
-    setLoading(true);
-    try {
-      const [hype, declining] = await Promise.all([
-        getHypeCategories(5),
-        getDecliningCategories(5)
-      ]);
-      setHypeCategories(hype);
-      setDecliningCategories(declining);
-    } catch (err) {
-      setError('Failed to refresh');
-    } finally {
-      setLoading(false);
-    }
+  const handleFilterChange = (e) => {
+    setSelectedParent(e.target.value);
   };
-
-  if (loading) {
-    return <div className="hype-indicator loading">Loading trends...</div>;
-  }
 
   if (error) {
     return <div className="hype-indicator error">{error}</div>;
@@ -119,22 +122,51 @@ export default function HypeIndicator({ onSelectCategory }) {
     <div className="hype-indicator">
       <div className="hype-header">
         <h2>Trend Overview</h2>
-        <button onClick={refresh} className="refresh-btn">Refresh</button>
       </div>
-      <div className="hype-lists">
-        <CategoryList
-          title="Hottest Categories"
-          categories={hypeCategories}
-          type="rising"
-          onSelectCategory={onSelectCategory}
-        />
-        <CategoryList
-          title="Cooling Down"
-          categories={decliningCategories}
-          type="declining"
-          onSelectCategory={onSelectCategory}
-        />
+
+      {/* Filter dropdown */}
+      <div style={{ marginBottom: '16px' }}>
+        <select
+          value={selectedParent}
+          onChange={handleFilterChange}
+          style={{
+            width: '100%',
+            padding: '8px 12px',
+            borderRadius: '6px',
+            border: '1px solid #d1d5db',
+            fontSize: '13px',
+            cursor: 'pointer'
+          }}
+        >
+          <option value="">All Categories</option>
+          {parentCategories.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name} ({p.subcategories.length})
+            </option>
+          ))}
+        </select>
       </div>
+
+      {loading ? (
+        <div style={{ textAlign: 'center', color: '#6b7280', padding: '20px' }}>
+          Loading...
+        </div>
+      ) : (
+        <div className="hype-lists">
+          <CategoryList
+            title={selectedParent ? `Hottest in ${selectedParent.toUpperCase()}` : "Hottest Categories"}
+            categories={hypeCategories}
+            type="rising"
+            onSelectCategory={onSelectCategory}
+          />
+          <CategoryList
+            title={selectedParent ? `Cooling in ${selectedParent.toUpperCase()}` : "Cooling Down"}
+            categories={decliningCategories}
+            type="declining"
+            onSelectCategory={onSelectCategory}
+          />
+        </div>
+      )}
     </div>
   );
 }
