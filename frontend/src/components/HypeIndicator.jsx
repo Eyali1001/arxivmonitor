@@ -3,6 +3,7 @@ import { getHypeCategories, getDecliningCategories } from '../api';
 
 function TrendBadge({ direction, score }) {
   const getColor = () => {
+    if (direction === 'surging') return '#059669';
     if (direction === 'rising') return '#16a34a';
     if (direction === 'growing') return '#65a30d';
     if (direction === 'declining') return '#dc2626';
@@ -11,6 +12,7 @@ function TrendBadge({ direction, score }) {
   };
 
   const getIcon = () => {
+    if (direction === 'surging') return '⬆';
     if (direction === 'rising' || direction === 'growing') return '↑';
     if (direction === 'declining' || direction === 'cooling') return '↓';
     return '→';

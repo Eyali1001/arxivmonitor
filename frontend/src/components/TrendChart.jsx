@@ -91,9 +91,9 @@ export default function TrendChart({ categoryId }) {
               <strong>Monthly Avg:</strong> {stats.average_monthly}
             </span>
             <span className={`stat trend-${stats.trend_direction}`}>
-              <strong>Trend:</strong> {stats.trend_direction}
-              {stats.recent_growth_percent > 0 ? ' +' : ' '}
-              {stats.recent_growth_percent}%
+              <strong>Growth since 2022:</strong>
+              {stats.hype_score > 0 ? ' +' : ' '}
+              {stats.hype_score}%
             </span>
           </div>
         </div>

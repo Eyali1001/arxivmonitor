@@ -207,6 +207,7 @@ const styles = `
     color: #1a1a2e;
   }
 
+  .stat.trend-surging { color: #059669; font-weight: bold; }
   .stat.trend-rising { color: #16a34a; }
   .stat.trend-growing { color: #65a30d; }
   .stat.trend-declining { color: #dc2626; }

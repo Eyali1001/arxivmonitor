@@ -94,32 +94,36 @@ def filter_valid_counts(counts: list[int]) -> list[int]:
 
 def calculate_hype_score(monthly_counts: list[int]) -> float:
     """
-    Calculate hype score based on recent growth trends.
-    Higher weight for more recent months.
-    Returns score from -100 (declining) to +100 (hyped)
+    Calculate hype score based on LONG-TERM growth (2022 to now).
+    Compares first year average to last year average for stable measurement.
+    Returns percentage growth (can exceed 100 for rapidly growing fields).
     """
     # Filter out invalid data points
     valid_counts = filter_valid_counts(monthly_counts)
 
-    if len(valid_counts) < 6:
+    if len(valid_counts) < 24:  # Need at least 2 years of data
         return 0.0
 
-    recent_3m = valid_counts[-3:]
-    previous_3m = valid_counts[-6:-3]
+    # Compare first 12 months vs last 12 months for long-term trend
+    first_year = valid_counts[:12]
+    last_year = valid_counts[-12:]
 
-    recent_avg = sum(recent_3m) / len(recent_3m)
-    previous_avg = sum(previous_3m) / len(previous_3m)
+    first_year_avg = sum(first_year) / len(first_year)
+    last_year_avg = sum(last_year) / len(last_year)
 
-    if previous_avg == 0:
+    if first_year_avg == 0:
         return 0.0
 
-    growth_rate = (recent_avg - previous_avg) / previous_avg * 100
-    return max(-100.0, min(100.0, growth_rate))
+    # Return actual percentage growth (not capped)
+    growth_rate = (last_year_avg - first_year_avg) / first_year_avg * 100
+    return round(growth_rate, 1)
 
 
 def get_trend_direction(hype_score: float) -> str:
-    """Get trend direction label based on hype score."""
-    if hype_score > 20:
+    """Get trend direction label based on long-term growth percentage."""
+    if hype_score > 50:
+        return "surging"
+    elif hype_score > 20:
         return "rising"
     elif hype_score > 5:
         return "growing"
