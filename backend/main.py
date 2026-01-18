@@ -27,7 +27,7 @@ app = FastAPI(title="arXiv Trends Dashboard API", lifespan=lifespan)
 # CORS middleware for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origins=["http://localhost:5173", "http://localhost:5174", "http://127.0.0.1:5173", "http://127.0.0.1:5174"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -71,17 +71,41 @@ class SyncStatus(BaseModel):
     last_sync: Optional[str] = None
 
 
+def filter_valid_counts(counts: list[int]) -> list[int]:
+    """
+    Filter out invalid data points:
+    - Zero counts (incomplete months)
+    - Suspiciously low counts (data collection errors)
+    """
+    if not counts:
+        return []
+
+    # Calculate median to detect outliers
+    sorted_counts = sorted([c for c in counts if c > 0])
+    if not sorted_counts:
+        return []
+
+    median = sorted_counts[len(sorted_counts) // 2]
+
+    # Filter out zeros and values that are less than 5% of median (likely errors)
+    threshold = max(5, median * 0.05)
+    return [c for c in counts if c >= threshold]
+
+
 def calculate_hype_score(monthly_counts: list[int]) -> float:
     """
     Calculate hype score based on recent growth trends.
     Higher weight for more recent months.
     Returns score from -100 (declining) to +100 (hyped)
     """
-    if len(monthly_counts) < 3:
+    # Filter out invalid data points
+    valid_counts = filter_valid_counts(monthly_counts)
+
+    if len(valid_counts) < 6:
         return 0.0
 
-    recent_3m = monthly_counts[-3:]
-    previous_3m = monthly_counts[-6:-3] if len(monthly_counts) >= 6 else monthly_counts[:3]
+    recent_3m = valid_counts[-3:]
+    previous_3m = valid_counts[-6:-3]
 
     recent_avg = sum(recent_3m) / len(recent_3m)
     previous_avg = sum(previous_3m) / len(previous_3m)
@@ -143,7 +167,18 @@ async def get_trends(category_id: str):
     if not rows:
         return []
 
-    return [MonthlyCount(year=row["year"], month=row["month"], count=row["count"]) for row in rows]
+    # Filter out months with zero or very low counts (incomplete data)
+    results = []
+    counts = [row["count"] for row in rows]
+    sorted_nonzero = sorted([c for c in counts if c > 0])
+    median = sorted_nonzero[len(sorted_nonzero) // 2] if sorted_nonzero else 0
+    threshold = max(5, median * 0.05) if median > 0 else 5
+
+    for row in rows:
+        if row["count"] >= threshold:
+            results.append(MonthlyCount(year=row["year"], month=row["month"], count=row["count"]))
+
+    return results
 
 
 @app.get("/api/trends/{category_id}/stats", response_model=TrendStats)
@@ -181,16 +216,20 @@ async def get_trend_stats(category_id: str):
         )
 
     counts = [row["count"] for row in rows]
-    total = sum(counts)
-    avg = total / len(counts) if counts else 0
+
+    # Filter out invalid counts for calculations
+    valid_counts = filter_valid_counts(counts)
+
+    total = sum(valid_counts)
+    avg = total / len(valid_counts) if valid_counts else 0
 
     hype_score = calculate_hype_score(counts)
     trend_direction = get_trend_direction(hype_score)
 
-    # Calculate recent growth (last 3 months vs previous 3)
-    if len(counts) >= 6:
-        recent = sum(counts[-3:])
-        previous = sum(counts[-6:-3])
+    # Calculate recent growth (last 3 months vs previous 3) using valid data
+    if len(valid_counts) >= 6:
+        recent = sum(valid_counts[-3:])
+        previous = sum(valid_counts[-6:-3])
         recent_growth = ((recent - previous) / previous * 100) if previous > 0 else 0
     else:
         recent_growth = 0

@@ -41,6 +41,71 @@ const styles = `
     font-size: 1.1rem;
   }
 
+  /* Sync Progress */
+  .sync-progress {
+    margin-top: 20px;
+    padding: 16px 24px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sync-progress-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  .sync-status-dot {
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .sync-progress-details {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+  }
+
+  .sync-message {
+    font-family: monospace;
+  }
+
+  .sync-progress-bar {
+    height: 8px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .sync-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+    border-radius: 4px;
+    transition: width 0.5s ease;
+  }
+
+  .sync-percentage {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 12px;
+    opacity: 0.8;
+  }
+
   .dashboard-main {
     display: grid;
     grid-template-columns: 1fr 350px;

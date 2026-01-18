@@ -29,4 +29,9 @@ export async function getDecliningCategories(limit = 10) {
   return response.data;
 }
 
+export async function getSyncStatus() {
+  const response = await api.get('/sync/status');
+  return response.data;
+}
+
 export default api;
