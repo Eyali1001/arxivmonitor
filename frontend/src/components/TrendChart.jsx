@@ -9,7 +9,8 @@ import {
   ResponsiveContainer,
   Legend,
   BarChart,
-  Bar
+  Bar,
+  Cell
 } from 'recharts';
 import { getTrends, getTrendStats, getParentCategoryStats } from '../api';
 
@@ -167,12 +168,20 @@ function ParentCategoryView({ parentId }) {
   if (loading) return <div className="trend-chart loading">Loading all subcategories...</div>;
   if (error) return <div className="trend-chart error">{error}</div>;
 
-  // Prepare comparison bar chart data
-  const barData = stats.map(s => ({
-    name: s.category_id,
-    growth: s.hype_score,
-    papers: s.total_papers
-  }));
+  // Calculate mean growth
+  const meanGrowth = stats.length > 0
+    ? stats.reduce((sum, s) => sum + s.hype_score, 0) / stats.length
+    : 0;
+
+  // Prepare comparison bar chart data - show growth RELATIVE to mean
+  const barData = stats
+    .map(s => ({
+      name: s.category_id,
+      relativeGrowth: s.hype_score - meanGrowth,
+      absoluteGrowth: s.hype_score,
+      papers: s.total_papers
+    }))
+    .sort((a, b) => b.relativeGrowth - a.relativeGrowth);
 
   // Prepare multi-line chart data
   const dates = new Set();
@@ -196,20 +205,45 @@ function ParentCategoryView({ parentId }) {
         {parentId.toUpperCase()} - Growth Rankings (2022 → Now)
       </h3>
 
-      {/* Growth comparison bar chart */}
+      {/* Growth comparison bar chart - relative to mean */}
       <div style={{ marginBottom: '30px' }}>
-        <h4>Long-term Growth by Subcategory</h4>
+        <h4>
+          Growth Relative to Average
+          <span style={{ fontWeight: 'normal', fontSize: '13px', color: '#6b7280', marginLeft: '10px' }}>
+            (avg: {meanGrowth.toFixed(1)}% growth)
+          </span>
+        </h4>
+        <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '10px' }}>
+          Positive = grew faster than average, Negative = grew slower than average
+        </p>
         <ResponsiveContainer width="100%" height={Math.max(300, stats.length * 25)}>
-          <BarChart data={barData} layout="vertical" margin={{ left: 100, right: 30 }}>
+          <BarChart data={barData} layout="vertical" margin={{ left: 100, right: 50 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis type="number" unit="%" />
-            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
-            <Tooltip formatter={(value) => `${value.toFixed(1)}%`} />
-            <Bar
-              dataKey="growth"
-              fill="#2563eb"
-              label={{ position: 'right', fontSize: 10, formatter: (v) => `${v.toFixed(0)}%` }}
+            <XAxis
+              type="number"
+              domain={['auto', 'auto']}
+              tickFormatter={(v) => `${v > 0 ? '+' : ''}${v.toFixed(0)}%`}
             />
+            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={90} />
+            <Tooltip
+              formatter={(value, name, props) => [
+                `${value > 0 ? '+' : ''}${value.toFixed(1)}% vs avg (actual: ${props.payload.absoluteGrowth.toFixed(1)}%)`,
+                'Relative Growth'
+              ]}
+            />
+            <Bar
+              dataKey="relativeGrowth"
+              fill={(entry) => entry.relativeGrowth >= 0 ? '#16a34a' : '#dc2626'}
+              label={{
+                position: 'right',
+                fontSize: 10,
+                formatter: (v) => `${v > 0 ? '+' : ''}${v.toFixed(0)}%`
+              }}
+            >
+              {barData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.relativeGrowth >= 0 ? '#16a34a' : '#dc2626'} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
